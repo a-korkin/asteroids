@@ -1,4 +1,7 @@
 #include "game.h"
+#include "ship.h"
+
+ship_t *ship;
 
 state_t *init(void) {
     state_t *state = (state_t *) malloc(sizeof(state_t));
@@ -24,7 +27,7 @@ state_t *init(void) {
         fprintf(stderr, "ERROR creating renderer: %s\n", SDL_GetError());
         exit(1);
     }
-    state->running = 1;
+    state->running = true;
 
     return state;
 }
@@ -32,16 +35,17 @@ state_t *init(void) {
 void handle_events(state_t *state) {
     SDL_PollEvent(&state->event);
     if (state->event.type == SDL_QUIT) {
-        state->running = 0;
+        state->running = false;
     }
     if (state->event.type == SDL_KEYDOWN) {
         switch (state->event.key.keysym.sym) {
-            case SDLK_ESCAPE: state->running = 0;
+            case SDLK_ESCAPE: state->running = false;
         }
     }
 }
 
 void dispose(state_t *state) {
+    dispose_ship(ship);
     SDL_DestroyRenderer(state->renderer);
     SDL_DestroyWindow(state->window);
     SDL_Quit();
@@ -57,6 +61,8 @@ void draw_background(state_t *state) {
 
 void draw(state_t *state) {
     draw_background(state);
+    // fprintf(stdout, "%d\n", ship->points[2].x);
+    draw_ship(state, ship);
     SDL_RenderPresent(state->renderer);
 }
 
@@ -69,6 +75,7 @@ void loop(state_t *state) {
 
 void run(void) {
     state_t *state = init();
+    ship = create_ship();
     loop(state);
     dispose(state);
 }
