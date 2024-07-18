@@ -1,9 +1,15 @@
 #include "game.h"
 #include "ship.h"
+#include <SDL2/SDL.h>
+#include <stdio.h>
 
 ship_t *ship;
 
 state_t *init(void) {
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        fprintf(stderr, "ERROR initialize SDL: %s\n", SDL_GetError());
+        exit(1);
+    }
     state_t *state = (state_t *) malloc(sizeof(state_t));
     if (!state) {
         fprintf(stderr, 
