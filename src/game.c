@@ -8,8 +8,6 @@
 #include <stdio.h>
 
 ship_t *ship;
-int start, end;
-bool pressed;
 
 state_t *init(void) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -66,15 +64,15 @@ void handle_events(state_t *state) {
         }
     }
     if (state->event.key.keysym.sym == SDLK_UP) {
-        if (state->event.key.state == SDL_PRESSED && !pressed) {
-            pressed = true;
-            start = SDL_GetTicks();
+        if (state->event.key.state == SDL_PRESSED && !ship->engine_work) {
+            ship->engine_work = true;
+            ship->start = SDL_GetTicks();
         }
-        if (state->event.key.state == SDL_RELEASED && pressed) {
-            pressed = false;
-            end = SDL_GetTicks();
+        if (state->event.key.state == SDL_RELEASED && ship->engine_work) {
+            ship->engine_work = false;
+            ship->end = SDL_GetTicks();
             fprintf(stdout, "start: %d, end: %d, diff: %d\n",
-                    start, end, end - start);
+                    ship->start, ship->end, ship->end - ship->start);
         }
     }
 }
@@ -111,14 +109,18 @@ void run(void) {
     state_t *state = init();
     ship = create_ship();
     SDL_FPoint center = { SCREEN_W/2.0f, SCREEN_H/2.0f };
-    SDL_FPoint _points[5] = {
-        { center.x, center.y + 50 },
+    SDL_FPoint _points[8] = {
+        { center.x, center.y + 50 },        // ship
         { center.x + 10, center.y + 10 },
         { center.x + 20, center.y + 50 }, 
-        { center.x + 2, center.y + 45 },
+        { center.x + 2, center.y + 45 },    // engine
         { center.x + 18, center.y + 45},
+        { center.x + 6, center.y + 45 },    // flame small
+        { center.x + 10, center.y + 53 },
+        { center.x + 14, center.y + 45 },
     };
     ship->points = _points;
+    ship->engine_work = false;
     loop(state);
     dispose(state);
 }

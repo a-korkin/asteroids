@@ -5,6 +5,8 @@
 
 typedef struct {
     SDL_FPoint *points;
+    int start, end;
+    bool engine_work;
 } ship_t;
 
 void draw_ship(state_t *state, ship_t *ship);

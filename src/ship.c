@@ -23,6 +23,13 @@ void draw_ship(state_t *state, ship_t *ship) {
         fprintf(stderr, "ERROR draw line for ship engine: %s\n", SDL_GetError());
         exit(1);
     }
+    // Flame small
+    if (ship->engine_work) {
+        if (SDL_RenderDrawLinesF(state->renderer, ship->points + 5, 3) < 0) {
+            fprintf(stderr, "ERROR draw line flame small: %s\n", SDL_GetError());
+            exit(1);
+        }
+    }
 }
 
 void dispose_ship(ship_t *ship) {
