@@ -15,7 +15,7 @@ void draw_ship(state_t *state, ship_t *ship) {
         fprintf(stderr, "ERROR draw lines for ship: %s\n", SDL_GetError());
         exit(1);
     }
-    // Draw engine
+    // Draw engine base
     // 3,4
     if (SDL_RenderDrawLineF(state->renderer, 
                 ship->points[3].x, ship->points[3].y,

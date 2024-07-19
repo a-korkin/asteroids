@@ -13,6 +13,7 @@
 
 #define SCREEN_W 640
 #define SCREEN_H 480
+#define PI 3.141592654
 
 typedef struct {
     SDL_Window *window;

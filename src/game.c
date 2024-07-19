@@ -6,6 +6,7 @@
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_timer.h>
 #include <stdio.h>
+#include <math.h>
 
 ship_t *ship;
 
@@ -53,6 +54,20 @@ ship_t *create_ship(void) {
     return ship;
 }
 
+void rotate_ship(void) {
+    double arg = 30;
+    double result;
+    arg = (arg * PI) / 180;
+    result = cos(arg);
+
+    for (int i = 0; i < 8; i++) {
+        float x = ship->points[i].x;
+        float y = ship->points[i].y;
+        ship->points[i].x = x * cos(arg) - y * sin(arg);
+        ship->points[i].y = x * sin(arg) + y * cos(arg);
+    }
+}
+
 void handle_events(state_t *state) {
     SDL_PollEvent(&state->event);
     if (state->event.type == SDL_QUIT) {
@@ -61,6 +76,7 @@ void handle_events(state_t *state) {
     if (state->event.type == SDL_KEYDOWN) {
         switch (state->event.key.keysym.sym) {
             case SDLK_ESCAPE: state->running = false; break;
+            case SDLK_RIGHT: rotate_ship(); break;
         }
     }
     if (state->event.key.keysym.sym == SDLK_UP) {
@@ -113,7 +129,7 @@ void run(void) {
         { center.x, center.y + 50 },        // ship
         { center.x + 10, center.y + 10 },
         { center.x + 20, center.y + 50 }, 
-        { center.x + 2, center.y + 45 },    // engine
+        { center.x + 2, center.y + 45 },    // engine base
         { center.x + 18, center.y + 45},
         { center.x + 6, center.y + 45 },    // flame small
         { center.x + 10, center.y + 53 },
