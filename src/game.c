@@ -1,10 +1,15 @@
 #include "game.h"
 #include "ship.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_keycode.h>
 #include <SDL2/SDL_rect.h>
+#include <SDL2/SDL_timer.h>
 #include <stdio.h>
 
 ship_t *ship;
+int start, end;
+bool pressed;
 
 state_t *init(void) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -57,7 +62,19 @@ void handle_events(state_t *state) {
     }
     if (state->event.type == SDL_KEYDOWN) {
         switch (state->event.key.keysym.sym) {
-            case SDLK_ESCAPE: state->running = false;
+            case SDLK_ESCAPE: state->running = false; break;
+        }
+    }
+    if (state->event.key.keysym.sym == SDLK_UP) {
+        if (state->event.key.state == SDL_PRESSED && !pressed) {
+            pressed = true;
+            start = SDL_GetTicks();
+        }
+        if (state->event.key.state == SDL_RELEASED && pressed) {
+            pressed = false;
+            end = SDL_GetTicks();
+            fprintf(stdout, "start: %d, end: %d, diff: %d\n",
+                    start, end, end - start);
         }
     }
 }
