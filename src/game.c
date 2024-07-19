@@ -38,6 +38,17 @@ state_t *init(void) {
     return state;
 }
 
+
+ship_t *create_ship(void) {
+    ship_t *ship = (ship_t *) malloc(sizeof(ship_t));
+    if (!ship) {
+        fprintf(stderr, 
+                "ERROR allocating memory for ship: %s\n", SDL_GetError());
+        exit(1);
+    }
+    return ship;
+}
+
 void handle_events(state_t *state) {
     SDL_PollEvent(&state->event);
     if (state->event.type == SDL_QUIT) {
@@ -67,7 +78,6 @@ void draw_background(state_t *state) {
 
 void draw(state_t *state) {
     draw_background(state);
-    // fprintf(stdout, "%d\n", ship->points[2].x);
     draw_ship(state, ship);
     SDL_RenderPresent(state->renderer);
 }
@@ -82,6 +92,14 @@ void loop(state_t *state) {
 void run(void) {
     state_t *state = init();
     ship = create_ship();
+    SDL_FPoint center = { SCREEN_W/2.0f, SCREEN_H/2.0f };
+    SDL_FPoint points[4] = {
+        { center.x + 10, center.y + 10 },
+        { center.x + 20, center.y + 50 }, 
+        { center.x, center.y + 50 },
+        { center.x + 10, center.y + 10 },
+    };
+    ship->points = points;
     loop(state);
     dispose(state);
 }
