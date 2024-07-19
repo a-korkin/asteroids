@@ -1,6 +1,7 @@
 #include "game.h"
 #include "ship.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_rect.h>
 #include <stdio.h>
 
 ship_t *ship;
@@ -93,13 +94,14 @@ void run(void) {
     state_t *state = init();
     ship = create_ship();
     SDL_FPoint center = { SCREEN_W/2.0f, SCREEN_H/2.0f };
-    SDL_FPoint points[4] = {
-        { center.x + 10, center.y + 10 },
-        { center.x + 20, center.y + 50 }, 
+    SDL_FPoint _points[5] = {
         { center.x, center.y + 50 },
         { center.x + 10, center.y + 10 },
+        { center.x + 20, center.y + 50 }, 
+        { center.x + 2, center.y + 45 },
+        { center.x + 18, center.y + 45},
     };
-    ship->points = points;
+    ship->points = _points;
     loop(state);
     dispose(state);
 }
