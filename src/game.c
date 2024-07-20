@@ -6,7 +6,6 @@
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_timer.h>
 #include <stdio.h>
-#include <math.h>
 
 ship_t *ship;
 int last_frame_time;
@@ -52,6 +51,7 @@ ship_t *create_ship(void) {
                 "ERROR allocating memory for ship: %s\n", SDL_GetError());
         exit(1);
     }
+    ship->angle = 0;
     return ship;
 }
 
@@ -65,9 +65,26 @@ float get_delta_time(void) {
     return delta_time;
 }
 
-// void update(void) {
-//     float delta_time = get_delta_time();
-// }
+void pew(ship_t *ship) {
+    bullet_t *bullet = (bullet_t *) malloc(sizeof(bullet_t));
+    if (!bullet) {
+        fprintf(stderr, 
+            "ERROR couldn't allocate memory for bullet: %s\n", SDL_GetError());
+        exit(1);
+    }
+    bullet->angle = ship->angle;
+    bullet->position.x = ship->points[1].x;
+    bullet->position.y = ship->points[1].y;
+    ship->bullets = bullet;
+    fprintf(stdout, "angle: %.2f, x: %.2f, y: %.2f\n", 
+            bullet->angle, bullet->position.x, bullet->position.y);
+}
+
+void update(void) {
+    float delta_time = get_delta_time();
+    update_bullet(delta_time, ship->bullets);
+    // fprintf(stdout, "x: %.2f, y: %.2f\n", ship->bullets->position.x, ship->bullets->position.y);
+}
 
 void handle_events(state_t *state) {
     SDL_PollEvent(&state->event);
@@ -80,6 +97,7 @@ void handle_events(state_t *state) {
             case SDLK_ESCAPE: state->running = false; break;
             case SDLK_RIGHT: rotate_ship(ship, ROT_RIGHT); break;
             case SDLK_LEFT: rotate_ship(ship, ROT_LEFT); break;
+            case SDLK_SPACE: pew(ship);
         }
     }
     if (state->event.key.keysym.sym == SDLK_UP) {
@@ -114,13 +132,14 @@ void draw_background(state_t *state) {
 void draw(state_t *state) {
     draw_background(state);
     draw_ship(state, ship);
+    draw_bullets(state, ship);
     SDL_RenderPresent(state->renderer);
 }
 
 void loop(state_t *state) {
     while (state->running) {
         handle_events(state);
-        // update();
+        update();
         draw(state);
     }
 }
