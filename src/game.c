@@ -9,6 +9,7 @@
 #include <math.h>
 
 ship_t *ship;
+int last_frame_time;
 
 state_t *init(void) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -39,10 +40,10 @@ state_t *init(void) {
         exit(1);
     }
     state->running = true;
+    last_frame_time = SDL_GetTicks();
 
     return state;
 }
-
 
 ship_t *create_ship(void) {
     ship_t *ship = (ship_t *) malloc(sizeof(ship_t));
@@ -54,29 +55,50 @@ ship_t *create_ship(void) {
     return ship;
 }
 
-void rotate_ship(void) {
-    double arg = 30;
+float get_delta_time(void) {
+    int time_to_wait = FRAME_TARGET_TIME - (SDL_GetTicks() - last_frame_time);
+    if (time_to_wait > 0 && time_to_wait <= FRAME_TARGET_TIME) {
+        SDL_Delay(time_to_wait);
+    }
+    float delta_time = (SDL_GetTicks() - last_frame_time) / 1000.0f;
+    last_frame_time = SDL_GetTicks();
+    return delta_time;
+}
+
+// void update(void) {
+//     float delta_time = get_delta_time();
+// }
+
+void rotate_ship(float delta_time, int dir) {
+    double arg = 15 * dir;
     double result;
     arg = (arg * PI) / 180;
-    result = cos(arg);
+    result = cos(arg) * dir;
 
-    for (int i = 0; i < 8; i++) {
-        float x = ship->points[i].x;
-        float y = ship->points[i].y;
-        ship->points[i].x = x * cos(arg) - y * sin(arg);
-        ship->points[i].y = x * sin(arg) + y * cos(arg);
+    SDL_FPoint center_ship = {
+        .x = ship->points[1].x,
+        .y = ship->points[1].y + 20,
+    };
+
+    for (int i = 0; i < SHIP_POINTS; i++) {
+        float x = ship->points[i].x - center_ship.x;
+        float y = ship->points[i].y - center_ship.y;
+        ship->points[i].x = (x * cos(arg) - y * sin(arg)) + center_ship.x;
+        ship->points[i].y = (x * sin(arg) + y * cos(arg)) + center_ship.y;
     }
 }
 
 void handle_events(state_t *state) {
     SDL_PollEvent(&state->event);
+    float delta_time = get_delta_time();
     if (state->event.type == SDL_QUIT) {
         state->running = false;
     }
     if (state->event.type == SDL_KEYDOWN) {
         switch (state->event.key.keysym.sym) {
             case SDLK_ESCAPE: state->running = false; break;
-            case SDLK_RIGHT: rotate_ship(); break;
+            case SDLK_RIGHT: rotate_ship(delta_time, 1); break;
+            case SDLK_LEFT: rotate_ship(delta_time, -1); break;
         }
     }
     if (state->event.key.keysym.sym == SDLK_UP) {
@@ -117,6 +139,7 @@ void draw(state_t *state) {
 void loop(state_t *state) {
     while (state->running) {
         handle_events(state);
+        // update();
         draw(state);
     }
 }
@@ -125,15 +148,23 @@ void run(void) {
     state_t *state = init();
     ship = create_ship();
     SDL_FPoint center = { SCREEN_W/2.0f, SCREEN_H/2.0f };
-    SDL_FPoint _points[8] = {
+    SDL_FPoint _points[SHIP_POINTS] = {
         { center.x, center.y + 50 },        // ship
-        { center.x + 10, center.y + 10 },
+        { center.x + 10, center.y + 10 },   // peak
         { center.x + 20, center.y + 50 }, 
         { center.x + 2, center.y + 45 },    // engine base
         { center.x + 18, center.y + 45},
         { center.x + 6, center.y + 45 },    // flame small
         { center.x + 10, center.y + 53 },
         { center.x + 14, center.y + 45 },
+        // { 0, 50 },        // ship
+        // { 10, 10 },
+        // { 20, 50 }, 
+        // { 2, 45 },    // engine base
+        // { 18,45},
+        // { 6, 45 },    // flame small
+        // { 10, 53 },
+        // { 14, 45 },
     };
     ship->points = _points;
     ship->engine_work = false;

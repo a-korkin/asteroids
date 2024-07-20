@@ -13,6 +13,8 @@
 
 #define SCREEN_W 640
 #define SCREEN_H 480
+#define FPS 60
+#define FRAME_TARGET_TIME (1000.0f/FPS)
 #define PI 3.141592654
 
 typedef struct {

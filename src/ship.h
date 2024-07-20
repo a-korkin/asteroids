@@ -3,6 +3,8 @@
 
 #include "game.h"
 
+#define SHIP_POINTS 8
+
 typedef struct {
     SDL_FPoint *points;
     int start, end;
