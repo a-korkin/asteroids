@@ -75,16 +75,11 @@ void rotate_ship(float delta_time, int dir) {
     arg = (arg * PI) / 180;
     result = cos(arg) * dir;
 
-    SDL_FPoint center_ship = {
-        .x = ship->points[1].x,
-        .y = ship->points[1].y + 20,
-    };
-
     for (int i = 0; i < SHIP_POINTS; i++) {
-        float x = ship->points[i].x - center_ship.x;
-        float y = ship->points[i].y - center_ship.y;
-        ship->points[i].x = (x * cos(arg) - y * sin(arg)) + center_ship.x;
-        ship->points[i].y = (x * sin(arg) + y * cos(arg)) + center_ship.y;
+        float x = ship->points[i].x - ship->points[SHIP_POINTS-1].x;
+        float y = ship->points[i].y - ship->points[SHIP_POINTS-1].y;
+        ship->points[i].x = (x * cos(arg) - y * sin(arg)) + ship->points[SHIP_POINTS-1].x;
+        ship->points[i].y = (x * sin(arg) + y * cos(arg)) + ship->points[SHIP_POINTS-1].y;
     }
 }
 
@@ -157,6 +152,7 @@ void run(void) {
         { center.x + 6, center.y + 45 },    // flame small
         { center.x + 10, center.y + 53 },
         { center.x + 14, center.y + 45 },
+        { center.x + 10, center.y + 30},    // center of ship
         // { 0, 50 },        // ship
         // { 10, 10 },
         // { 20, 50 }, 
