@@ -32,6 +32,22 @@ void draw_ship(state_t *state, ship_t *ship) {
     }
 }
 
+void rotate_ship(ship_t *ship, rotation_t rot) {
+    double arg = 15 * rot;
+    double result;
+    arg = (arg * PI) / 180;
+    result = cos(arg) * rot;
+
+    for (int i = 0; i < SHIP_POINTS; i++) {
+        float x = ship->points[i].x - ship->points[SHIP_POINTS-1].x;
+        float y = ship->points[i].y - ship->points[SHIP_POINTS-1].y;
+        ship->points[i].x = (x * cos(arg) - y * sin(arg)) 
+            + ship->points[SHIP_POINTS-1].x;
+        ship->points[i].y = (x * sin(arg) + y * cos(arg)) 
+            + ship->points[SHIP_POINTS-1].y;
+    }
+}
+
 void dispose_ship(ship_t *ship) {
     free(ship);
 }

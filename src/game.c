@@ -69,20 +69,6 @@ float get_delta_time(void) {
 //     float delta_time = get_delta_time();
 // }
 
-void rotate_ship(float delta_time, int dir) {
-    double arg = 15 * dir;
-    double result;
-    arg = (arg * PI) / 180;
-    result = cos(arg) * dir;
-
-    for (int i = 0; i < SHIP_POINTS; i++) {
-        float x = ship->points[i].x - ship->points[SHIP_POINTS-1].x;
-        float y = ship->points[i].y - ship->points[SHIP_POINTS-1].y;
-        ship->points[i].x = (x * cos(arg) - y * sin(arg)) + ship->points[SHIP_POINTS-1].x;
-        ship->points[i].y = (x * sin(arg) + y * cos(arg)) + ship->points[SHIP_POINTS-1].y;
-    }
-}
-
 void handle_events(state_t *state) {
     SDL_PollEvent(&state->event);
     float delta_time = get_delta_time();
@@ -92,8 +78,8 @@ void handle_events(state_t *state) {
     if (state->event.type == SDL_KEYDOWN) {
         switch (state->event.key.keysym.sym) {
             case SDLK_ESCAPE: state->running = false; break;
-            case SDLK_RIGHT: rotate_ship(delta_time, 1); break;
-            case SDLK_LEFT: rotate_ship(delta_time, -1); break;
+            case SDLK_RIGHT: rotate_ship(ship, ROT_RIGHT); break;
+            case SDLK_LEFT: rotate_ship(ship, ROT_LEFT); break;
         }
     }
     if (state->event.key.keysym.sym == SDLK_UP) {
@@ -153,14 +139,6 @@ void run(void) {
         { center.x + 10, center.y + 53 },
         { center.x + 14, center.y + 45 },
         { center.x + 10, center.y + 30},    // center of ship
-        // { 0, 50 },        // ship
-        // { 10, 10 },
-        // { 20, 50 }, 
-        // { 2, 45 },    // engine base
-        // { 18,45},
-        // { 6, 45 },    // flame small
-        // { 10, 53 },
-        // { 14, 45 },
     };
     ship->points = _points;
     ship->engine_work = false;
