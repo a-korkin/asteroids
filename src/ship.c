@@ -34,13 +34,17 @@ void draw_ship(state_t *state, ship_t *ship) {
 }
 
 void draw_bullets(state_t *state, ship_t *ship) {
-    if (ship->bullets) {
-        if (SDL_RenderDrawPointF(
-                    state->renderer, 
-                    ship->bullets->position.x, ship->bullets->position.y) < 0) {
-            fprintf(stderr, "ERROR draw bullet: %s\n", SDL_GetError());
-            exit(1);
+    bullet_t *bullet = ship->bullets;
+    while (bullet) {
+        if (bullet->show) {
+            if (SDL_RenderDrawPointF(
+                        state->renderer, 
+                        bullet->position.x, bullet->position.y) < 0) {
+                fprintf(stderr, "ERROR draw bullet: %s\n", SDL_GetError());
+                exit(1);
+            }
         }
+        bullet = bullet->next;
     }
 }
 
@@ -60,10 +64,27 @@ void rotate_ship(ship_t *ship, rotation_t rot) {
     ship->angle += degree;
 }
 
-void update_bullet(float delta_time, bullet_t *bullet) {
-    if (bullet) {
+void update_bullets(float delta_time, bullet_t *bullets) {
+    bullet_t *bullet = bullets;
+    while (bullet) {
+        if (bullet->position.x <= 20 
+            || bullet->position.x >= SCREEN_W - 20
+            || bullet->position.y <= 20
+            || bullet->position.y >= SCREEN_H - 20) {
+            bullet->show = false;
+        }
+
         bullet->position.x += BULLET_SPEED * sin(bullet->angle);
         bullet->position.y -= BULLET_SPEED * cos(bullet->angle);
+        bullet = bullet->next;
+
+    }
+}
+
+void move_ship(float delta_time, ship_t *ship) {
+    for (int i = 0; i < SHIP_POINTS; i++) {
+        ship->points[i].x += SHIP_SPEED * sin(ship->angle);
+        ship->points[i].y -= SHIP_SPEED * cos(ship->angle);
     }
 }
 

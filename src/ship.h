@@ -7,12 +7,14 @@
 #define SHIP_POINTS 9
 #define ROTATION_ANGLE 15
 #define BULLET_SPEED 4
+#define SHIP_SPEED 3
 
-typedef struct {
+typedef struct bullet {
     SDL_FPoint position;
-    // SDL_FPoint velocity;
     float angle;
     bool show;
+    struct bullet *prev;
+    struct bullet *next;
 } bullet_t;
 
 typedef struct {
@@ -21,6 +23,7 @@ typedef struct {
     bool engine_work;
     float angle;
     bullet_t *bullets;
+    bullet_t *last_bullet;
 } ship_t;
 
 typedef enum {
@@ -31,7 +34,8 @@ typedef enum {
 void draw_ship(state_t *state, ship_t *ship);
 void draw_bullets(state_t *state, ship_t *ship);
 void rotate_ship(ship_t *ship, rotation_t rot);
-void update_bullet(float delta_time, bullet_t *bullet);
+void update_bullets(float delta_time, bullet_t *bullets);
+void move_ship(float delta_time, ship_t *ship);
 void dispose_ship(ship_t *ship);
 
 #endif //__SHIP_H

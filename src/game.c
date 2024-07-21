@@ -6,6 +6,7 @@
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_timer.h>
 #include <stdio.h>
+#include <time.h>
 
 ship_t *ship;
 int last_frame_time;
@@ -72,18 +73,28 @@ void pew(ship_t *ship) {
             "ERROR couldn't allocate memory for bullet: %s\n", SDL_GetError());
         exit(1);
     }
+    bullet->show = true;
     bullet->angle = ship->angle;
     bullet->position.x = ship->points[1].x;
     bullet->position.y = ship->points[1].y;
-    ship->bullets = bullet;
+    if (!ship->bullets) {
+        ship->bullets = bullet;
+        ship->last_bullet = bullet;
+    }
+    if (ship->last_bullet) {
+        bullet->prev = ship->last_bullet;
+        ship->last_bullet->next = bullet;
+        bullet->next = NULL;
+    }
+    ship->last_bullet = bullet;
+   
     fprintf(stdout, "angle: %.2f, x: %.2f, y: %.2f\n", 
             bullet->angle, bullet->position.x, bullet->position.y);
 }
 
 void update(void) {
     float delta_time = get_delta_time();
-    update_bullet(delta_time, ship->bullets);
-    // fprintf(stdout, "x: %.2f, y: %.2f\n", ship->bullets->position.x, ship->bullets->position.y);
+    update_bullets(delta_time, ship->bullets);
 }
 
 void handle_events(state_t *state) {
@@ -108,8 +119,9 @@ void handle_events(state_t *state) {
         if (state->event.key.state == SDL_RELEASED && ship->engine_work) {
             ship->engine_work = false;
             ship->end = SDL_GetTicks();
-            fprintf(stdout, "start: %d, end: %d, diff: %d\n",
-                    ship->start, ship->end, ship->end - ship->start);
+            // fprintf(stdout, "start: %d, end: %d, diff: %d\n",
+            //         ship->start, ship->end, ship->end - ship->start);
+            move_ship(delta_time, ship);
         }
     }
 }
