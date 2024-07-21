@@ -64,6 +64,18 @@ void rotate_ship(ship_t *ship, rotation_t rot) {
     ship->angle += degree;
 }
 
+void drop_bullets(bullet_t *bullets) {
+    bullet_t *bullet = bullets;
+    while (bullet && !bullet->show) {
+        if (bullet->prev && bullet->next) {
+            bullet->prev->next = bullet->next;
+            bullet->next->prev = bullet->prev;
+        }
+        free(bullet);
+        bullet = bullet->next;
+    }
+}
+
 void update_bullets(float delta_time, bullet_t *bullets) {
     bullet_t *bullet = bullets;
     while (bullet) {
@@ -72,13 +84,12 @@ void update_bullets(float delta_time, bullet_t *bullets) {
             || bullet->position.y <= 20
             || bullet->position.y >= SCREEN_H - 20) {
             bullet->show = false;
-        }
-
+        } 
         bullet->position.x += BULLET_SPEED * sin(bullet->angle);
         bullet->position.y -= BULLET_SPEED * cos(bullet->angle);
         bullet = bullet->next;
-
     }
+    // drop_bullets(bullets);
 }
 
 void move_ship(float delta_time, ship_t *ship) {
