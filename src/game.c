@@ -94,7 +94,9 @@ void pew(ship_t *ship) {
 
 void update(void) {
     float delta_time = get_delta_time();
-    update_bullets(delta_time, ship->bullets);
+    if (ship->bullets) {
+        update_bullets(delta_time, ship->bullets);
+    }
 }
 
 void handle_events(state_t *state) {
@@ -173,6 +175,7 @@ void run(void) {
     };
     ship->points = _points;
     ship->engine_work = false;
+    ship->bullets = NULL;
     loop(state);
     dispose(state);
 }

@@ -71,7 +71,7 @@ void drop_bullets(bullet_t *bullets) {
             bullet->prev->next = bullet->next;
             bullet->next->prev = bullet->prev;
         }
-        free(bullet);
+        // free(bullet);
         bullet = bullet->next;
     }
 }
